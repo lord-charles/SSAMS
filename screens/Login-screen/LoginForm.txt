@@ -1,0 +1,160 @@
+import {
+  Button,
+  Text,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+} from "react-native";
+import React from "react";
+import PasswordField from "../../components/UI/PasswordField";
+import { useState } from "react";
+
+
+const LoginForm = (props) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  const [usernameError, setUsernameError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  const usernameChangeHandler = (username) => {
+    setUsernameError('');
+    setUsername(username);
+  };
+
+  const passwordChangeHandler = (password) => {
+    setPasswordError('');
+    setPassword(password);
+  };
+
+  const onLoginPressHandler = async () => {
+    // INPUTS VALIDATION AND ERROR HANDLING
+
+    if (username.trim().length === 0) {
+      setUsernameError('Username cannot be empty, please try again');
+      return;
+    }
+    if (password.trim().length === 0) {
+      setPasswordError('Password cannot be empty, please try again');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://35.244.58.160/api/authentication', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+        }),
+      });
+
+      if (!response.ok) {
+        // Handle authentication failure
+        console.error('Authentication failed');
+        return;
+      }
+
+      // Authentication successful, call the loginPressHandler
+      setUsernameError('');
+      setPasswordError('');
+      props.loginPressHandler();
+
+    } catch (error) {
+      console.error('Error during authentication:', error);
+    }
+  };
+
+  const onForgotPassPressHandler = () => {
+    // console.log("forgot pass pressed!");
+  };
+
+  return (
+    <View style={styles.container}>
+      <TextInput
+        value={username}
+        style={usernameError ? styles.inputError : styles.input}
+        placeholderTextColor="#A7A7A7"
+        placeholder="Username"
+        onChangeText={usernameChangeHandler}
+      />
+      <PasswordField
+        style={passwordError ? styles.inputError : styles.input}
+        onChange={passwordChangeHandler}
+      />
+      {usernameError && <Text style={styles.text}>{usernameError}</Text>}
+      {passwordError && <Text style={styles.text}>{passwordError}</Text>}
+      <View style={styles.btnView}>
+        <Pressable
+          onPress={onForgotPassPressHandler}
+          style={({ pressed }) => pressed && styles.opacity}
+        >
+          <Text style={styles.forgotPassBtn}>Forgot Password?</Text>
+        </Pressable>
+      </View>
+      <View style={styles.btnView}>
+        <Pressable
+          onPress={onLoginPressHandler}
+          style={({ pressed }) => pressed && styles.opacity}
+        >
+          <Text style={styles.loginBtn}>LOGIN</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+};
+
+export default LoginForm;
+
+const styles = StyleSheet.create({
+  container: {
+    borderRadius: 15,
+    backgroundColor: "#55BABB",
+    padding: 25,
+    width: "81%",
+    // marginLeft: windowWidth > 380 ? 50 : 35,
+    // marginRight: windowWidth > 380 ? 50 : 35,
+    gap: 15,
+  },
+  text: {
+    fontSize: 11,
+    textAlign: "center",
+    color: "red",
+  },
+  input: {
+    backgroundColor: "white",
+    padding: 5,
+    paddingLeft: 10,
+    borderRadius: 13,
+    height: 40,
+  },
+  inputError: {
+    backgroundColor: "pink",
+    padding: 5,
+    paddingLeft: 10,
+    borderRadius: 13,
+    height: 40,
+  },
+  btnView: {
+    alignItems: "center",
+  },
+  forgotPassBtn: {
+    color: "white",
+    textDecorationLine: "underline",
+  },
+  opacity: {
+    opacity: 0.7,
+  },
+  loginBtn: {
+    backgroundColor: "#2A3168",
+    color: "white",
+    paddingVertical: 10,
+    paddingHorizontal: 65,
+    borderRadius: 20,
+    fontWeight: "bold",
+    fontSize: 17,
+  },
+});
