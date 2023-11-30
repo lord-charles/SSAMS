@@ -1,33 +1,8 @@
-const app = require("express")();
-const bodyParser = require("body-parser");
-const morgan = require("morgan"); // import morgan for request logging
-const cors = require("cors"); // import cors for handling Cross-Origin Resource Sharing (CORS)
-const { notFound, errorHandler } = require("./middlewares/error-handler");
-const dotenv = require("dotenv");
-dotenv.config();
-const PORT = process.env.PORT || 8000;
-const dbConnect = require("./config/dbConnect");
-const dataSet = require("./routes/dataset");
-const usersRouter = require("./routes/userAuth");
+import { registerRootComponent } from 'expo';
 
+import App from './App';
 
-
-dbConnect();
-// apply middlewares
-app.use(morgan("dev"));
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use("/data-set", dataSet);
-app.use("/user", usersRouter);
-
-
-
-//error handlers
-app.use(notFound);
-app.use(errorHandler);
-
-// start the server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}.`);
-});
+// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
+// It also ensures that whether you load the app in Expo Go or in a native build,
+// the environment is set up appropriately
+registerRootComponent(App);
